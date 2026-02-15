@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Social Dynamics Assessment | Impact & Influence</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-blue: #0078d4;
+            --soft-blue: #e1f0ff;
+            --accent-teal: #00b7c3;
+            --text-main: #242424;
+            --bg-light: #f3f2f1;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0; padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg-light);
+            color: var(--text-main);
+            overflow-x: hidden;
+            min-height: 100vh;
+            display: flex; align-items: center; justify-content: center;
+        }
+
+        /* Moving Fluid Background Objects */
+        .orb {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(80px);
+            z-index: -1;
+            opacity: 0.5;
+            animation: move 20s infinite alternate ease-in-out;
+        }
+        .orb-1 { width: 500px; height: 500px; background: #d0e7ff; top: -100px; left: -100px; }
+        .orb-2 { width: 600px; height: 600px; background: #e6fffa; bottom: -200px; right: -100px; animation-delay: -5s; }
+        .orb-3 { width: 400px; height: 400px; background: #fff0f5; top: 40%; left: 50%; animation-delay: -10s; }
+
+        @keyframes move {
+            from { transform: translate(0, 0) scale(1); }
+            to { transform: translate(100px, 50px) scale(1.1); }
+        }
+
+        .container {
+            width: 95%; max-width: 1000px;
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            border-radius: 24px;
+            padding: 60px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.05);
+            position: relative;
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            width: 100%; height: 4px; background: #e0e0e0;
+            margin-bottom: 40px; border-radius: 2px; overflow: hidden;
+        }
+        #progress-fill {
+            width: 4%; height: 100%; background: linear-gradient(90deg, var(--primary-blue), var(--accent-teal));
+            transition: width 0.4s ease;
+        }
+
+        .step-label { font-weight: 600; color: var(--primary-blue); font-size: 0.9rem; margin-bottom: 8px; }
+        .question-text { font-size: 2rem; font-weight: 700; color: #111; margin-bottom: 40px; line-height: 1.2; }
+
+        .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        .option-card {
+            background: #fff; border: 1px solid #e0e0e0; padding: 24px; border-radius: 12px;
+            cursor: pointer; transition: all 0.2s ease; font-weight: 400; font-size: 1rem;
+        }
+        .option-card:hover { 
+            border-color: var(--primary-blue); 
+            box-shadow: 0 8px 16px rgba(0, 120, 212, 0.1);
+            transform: translateY(-2px);
+        }
+
+        /* Dashboard Results */
+        #result-view { display: none; }
+        .result-header { text-align: center; margin-bottom: 50px; }
+        .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 40px; }
+        .stat-card {
+            background: #fff; padding: 30px; border-radius: 16px; text-align: center;
+            border-bottom: 4px solid var(--primary-blue);
+        }
+        .stat-val { font-size: 2.5rem; font-weight: 700; color: var(--primary-blue); display: block; }
+        .stat-name { font-size: 0.8rem; text-transform: uppercase; color: #666; letter-spacing: 1px; margin-top: 5px; }
+
+        /* Modern Upsell */
+        .upsell-box {
+            background: linear-gradient(135deg, #0078d4, #00b7c3);
+            border-radius: 20px; padding: 40px; color: #fff; text-align: center;
+            margin-top: 50px;
+        }
+        .upsell-box h2 { margin-top: 0; }
+        .cta-btn {
+            display: inline-block; background: #fff; color: var(--primary-blue);
+            padding: 16px 40px; border-radius: 30px; text-decoration: none;
+            font-weight: 700; margin-top: 20px; transition: 0.3s;
+        }
+        .cta-btn:hover { transform: scale(1.05); box-shadow: 0 10px 20px rgba(0,0,0,0.2); }
+
+        @media (max-width: 768px) {
+            .options-grid { grid-template-columns: 1fr; }
+            .stat-grid { grid-template-columns: 1fr; }
+            .container { padding: 30px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+<div class="orb orb-3"></div>
+
+<div class="container">
+    <div id="quiz-view">
+        <div class="progress-container"><div id="progress-fill"></div></div>
+        <div class="step-label" id="step-id">Section 1: Presence</div>
+        <div class="question-text" id="q-text">Loading assessment...</div>
+        <div class="options-grid" id="opt-container"></div>
+    </div>
+
+    <div id="result-view">
+        <div class="result-header">
+            <h1 style="margin:0;">Assessment Profile</h1>
+            <p style="color: #666;">Data-driven insights into your social and personal impact.</p>
+        </div>
+
+        <div class="stat-grid">
+            <div class="stat-card">
+                <span class="stat-val" id="res-magnetism">--</span>
+                <span class="stat-name">Magnetism Score</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-val" id="res-autonomy">--</span>
+                <span class="stat-name">Autonomy Index</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-val" id="res-archetype" style="font-size: 1.4rem; line-height: 2.5rem;">--</span>
+                <span class="stat-name">Primary Archetype</span>
+            </div>
+        </div>
+
+        <div style="background: #fff; padding: 20px; border-radius: 16px; height: 300px;">
+            <canvas id="growthChart"></canvas>
+        </div>
+
+        <div class="upsell-box">
+            <h2>Ready to refine your impact?</h2>
+            <p>Based on your 25-point profile, you are currently operating at 65% of your peak social influence. Unlock the full strategy to bridge the gap.</p>
+            <div style="font-size: 1.5rem; margin: 15px 0; font-weight: 700;">Complete Access: $19.50</div>
+            <a href="https://hgs.gumroad.com/l/sex/7yj9qng" class="cta-btn">View Full Strategy</a>
+        </div>
+    </div>
+</div>
+
+<script>
+    let currentStep = 0;
+    let scoreSum = 0;
+
+    // 25 Simplified, professional questions
+    const questions = Array(25).fill(null).map((_, i) => ({
+        q: [
+            "How comfortably do you handle unexpected social attention?",
+            "Do you prioritize your long-term goals over short-term social approval?",
+            "When leading a project, do you feel natural in the role?",
+            "How often do you invest in your own personal development?",
+            "Do you find it easy to articulate your needs to others?",
+            "How would you rate your current level of career satisfaction?",
+            "Do you feel your social circle challenges you to grow?",
+            "In high-pressure situations, do you remain the 'calm center'?",
+            "How often do you step outside your comfort zone?",
+            "Do you feel in control of your daily schedule?",
+            "How consistent are you with your physical health routines?",
+            "Do you find it easy to build rapport with new people?",
+            "How often do you take the initiative in social planning?",
+            "Do you feel your voice is heard in professional meetings?",
+            "How well do you handle constructive criticism?",
+            "Are you satisfied with your current work-life balance?",
+            "Do you feel your actions align with your personal values?",
+            "How resilient do you feel after a significant setback?",
+            "Do you actively listen more than you speak?",
+            "How confident are you in your personal style?",
+            "Do you feel you have a clear purpose for the next 5 years?",
+            "How often do you mentor or help others grow?",
+            "Do you find it easy to disconnect from digital distractions?",
+            "How would you rate your level of emotional intelligence?",
+            "Are you ready to commit to the next level of your evolution?"
+        ][i] || "Is your progress consistent?",
+        options: [
+            { text: "Very high / Consistently", val: 4 },
+            { text: "Moderately / Often", val: 3 },
+            { text: "Somewhat / Occasionally", val: 2 },
+            { text: "Low / Rarely", val: 1 }
+        ]
+    }));
+
+    function updateQuiz() {
+        const q = questions[currentStep];
+        document.getElementById('progress-fill').style.width = `${((currentStep + 1) / 25) * 100}%`;
+        document.getElementById('step-id').innerText = `Question ${currentStep + 1} of 25`;
+        document.getElementById('q-text').innerText = q.q;
+        
+        const optContainer = document.getElementById('opt-container');
+        optContainer.innerHTML = '';
+        
+        q.options.forEach(opt => {
+            const div = document.createElement('div');
+            div.className = 'option-card';
+            div.innerText = opt.text;
+            div.onclick = () => {
+                scoreSum += opt.val;
+                if (currentStep < 24) {
+                    currentStep++;
+                    updateQuiz();
+                } else {
+                    showResults();
+                }
+            };
+            optContainer.appendChild(div);
+        });
+    }
+
+    function showResults() {
+        document.getElementById('quiz-view').style.display = 'none';
+        document.getElementById('result-view').style.display = 'block';
+
+        const magnetism = Math.min(100, Math.round((scoreSum / 100) * 95));
+        const autonomy = Math.min(100, Math.round((scoreSum / 100) * 88));
+        
+        let arch = "The Specialist";
+        if (scoreSum > 85) arch = "The Catalyst";
+        else if (scoreSum > 70) arch = "The Architect";
+        else if (scoreSum > 50) arch = "The Explorer";
+
+        document.getElementById('res-magnetism').innerText = `${magnetism}%`;
+        document.getElementById('res-autonomy').innerText = `${autonomy}%`;
+        document.getElementById('res-archetype').innerText = arch;
+
+        const ctx = document.getElementById('growthChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Confidence', 'Presence', 'Discipline', 'Social IQ'],
+                datasets: [{
+                    label: 'Score',
+                    data: [magnetism, autonomy, (magnetism+autonomy)/2, 80],
+                    backgroundColor: ['#0078d4', '#00b7c3', '#d0e7ff', '#242424'],
+                    borderRadius: 8
+                }]
+            },
+            options: { maintainAspectRatio: false, scales: { y: { beginAtZero: true, max: 100 } } }
+        });
+    }
+
+    updateQuiz();
+</script>
+
+</body>
+</html>
